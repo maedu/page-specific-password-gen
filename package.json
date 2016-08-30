@@ -1,0 +1,29 @@
+{
+  "name": "page-specific-password-gen",
+  "version": "1.0.0",
+  "description": "A small library which allows the generation of page specific passwords",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maedu/page-specific-password-gen.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maedu/page-specific-password-gen/issues"
+  },
+  "homepage": "https://github.com/maedu/page-specific-password-gen#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-debug": "^2.1.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^2.0.0"
+  }
+}
