@@ -38,7 +38,7 @@ var passwordLib = (function () {
 				console.log('calculatePassword, salt:', salt);
 
 			// Encrypt password using the original password and the given salt value
-			var iterations = intOptions.baseIterations + (salt.length + originalPassword.length + 1);
+			var iterations = intOptions.iterations + (salt.length + originalPassword.length + 1);
 
 			if (mypbkdf2 != null)
 				mypbkdf2.stop();
@@ -59,9 +59,9 @@ var passwordLib = (function () {
 
 		// Generate actual password (based on encrypted password), using the given criteria
 		var typeCount = 0;
-		if (options.smallChars)
+		if (options.smallLetters)
 			typeCount++;
-		if (options.capitalChars)
+		if (options.capitalLetters)
 			typeCount++;
 		if (options.numbers)
 			typeCount++;
@@ -72,8 +72,8 @@ var passwordLib = (function () {
 		var newPassword = "";
 		var specialCharsListStart = salt.length % options.specialCharList.length;
 
-		var smallCharsAdded = false;
-		var capitalCharsAdded = false;
+		var smallLettersAdded = false;
+		var capitalLettersAdded = false;
 		var numbersAdded = false;
 		var specialCharsAdded = false;
 		var charAdded = false;
@@ -87,16 +87,16 @@ var passwordLib = (function () {
 
 			if (typeCount > 0) {
 				// Generate prefix, containing one of each
-				if (options.smallChars && !smallCharsAdded && charCode >= 97
+				if (options.smallLetters && !smallLettersAdded && charCode >= 97
 						&& charCode <= 122) {
 					prefix += curChar;
-					smallCharsAdded = true;
+					smallLettersAdded = true;
 					typeCount--;
 					charAdded = true;
-				} else if (options.capitalChars && !capitalCharsAdded && charCode >= 65
+				} else if (options.capitalLetters && !capitalLettersAdded && charCode >= 65
 						&& charCode <= 90) {
 					prefix += curChar;
-					capitalCharsAdded = true;
+					capitalLettersAdded = true;
 					typeCount--;
 					charAdded = true;
 				} else if (options.numbers && !numbersAdded && charCode >= 48
@@ -117,9 +117,9 @@ var passwordLib = (function () {
 			}
 
 			if (!charAdded) {
-				if (options.smallChars && charCode >= 97 && charCode <= 122) {
+				if (options.smallLetters && charCode >= 97 && charCode <= 122) {
 					newPassword += curChar;
-				} else if (options.capitalChars && charCode >= 65 && charCode <= 90) {
+				} else if (options.capitalLetters && charCode >= 65 && charCode <= 90) {
 					newPassword += curChar;
 				} else if (options.numbers && charCode >= 48 && charCode <= 57) {
 					newPassword += curChar;
@@ -144,7 +144,7 @@ var passwordLib = (function () {
 	/**
 	 * @deprecated old version, obsolete, use calculatePassword() instead
 	 */
-	function calculatePasswordOld(originalPassword, url, length, smallChars, capitalChars, numbers, specialChars, specialCharList, resultCallback){
+	function calculatePasswordOld(originalPassword, url, length, smallLetters, capitalLetters, numbers, specialChars, specialCharList, resultCallback){
 		if (originalPassword.trim() == '') {
 			// Skip calculation for an empty password
 			return '';
@@ -174,8 +174,8 @@ var passwordLib = (function () {
 			newPassword = tempPassword;
 		}
 
-		if (!smallChars){
-			if (capitalChars){
+		if (!smallLetters){
+			if (capitalLetters){
 				newPassword = newPassword.toUpperCase();
 			} else if (numbers){
 				tempPassword = '';
@@ -185,7 +185,7 @@ var passwordLib = (function () {
 				newPassword = tempPassword;
 			}
 		}
-		if (capitalChars && smallChars){
+		if (capitalLetters && smallLetters){
 			tempPassword = '';
 			var c = 0;
 			for(var i=0;i<newPassword.length; i++){
@@ -287,12 +287,12 @@ var passwordLib = (function () {
 	function getDefaultOptions() {
 		return {
 			length: 20,
-			smallChars: true,
-			capitalChars: true,
+			smallLetters: true,
+			capitalLetters: true,
 			numbers: true,
 			specialChars: true,
 			specialCharList: '][?/<~#`!@$%^&*()+=}|:";\',>{',
-			baseIterations: 100,
+			iterations: 100,
 			statusCallback: undefined
 		};
 	}

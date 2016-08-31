@@ -27,6 +27,7 @@ gulp.task('scriptsMinified', function() {
 
 gulp.task('scriptsNormal', function() {
   return gulp.src(['src/**/*.js'])
+    .pipe(debug())
     .pipe(sourcemaps.init())
     .pipe(concat('page-specific-password-gen.js'))
     .pipe(sourcemaps.write('./', {

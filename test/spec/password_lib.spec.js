@@ -8,12 +8,12 @@
       var defaultOptions = passwordLib.getDefaultOptions();
 
       expect(defaultOptions.length).toBe(20);
-      expect(defaultOptions.smallChars).toBe(true);
-      expect(defaultOptions.capitalChars).toBe(true);
+      expect(defaultOptions.smallLetters).toBe(true);
+      expect(defaultOptions.capitalLetters).toBe(true);
       expect(defaultOptions.numbers).toBe(true);
       expect(defaultOptions.specialChars).toBe(true);
       expect(defaultOptions.specialCharList).toBe('][?/<~#`!@$%^&*()+=}|:";\',>{');
-      expect(defaultOptions.baseIterations).toBe(100);
+      expect(defaultOptions.iterations).toBe(100);
     });
 
   });
@@ -141,6 +141,9 @@
 
 
   describe('Tests for password_lib.calculatePassword', function () {
+
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+
     describe('Tests for default options with proper url', function () {
       var result = undefined;
       var expectedPassword = 'mY6&oQmNSV1vdGZo3laj';
@@ -172,7 +175,6 @@
       var url = 'http://www.foo.com/abcd?xyz';
       var password = 'bar';
       var defaultOptions = passwordLib.getDefaultOptions();
-      var statusCallbackCallCount = 0;
 
       beforeEach(function(done) {
         var statusCallback = function(percentage) {
@@ -183,12 +185,11 @@
           done();
         };
         
-        passwordLib.calculatePassword(password, url, { verbose: true, statusCallback: statusCallback }).then(resultCallback);
+        passwordLib.calculatePassword(password, url, { verbose: true }).then(resultCallback);
       });
 
       it('should calculate password correctly', function () {
         expect(result).toBe(expectedPassword);
-        expect(statusCallbackCallCount).not.toBeLessThan(1);
       });
     });
 
@@ -283,7 +284,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, { smallChars: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+        passwordLib.calculatePassword(password, url, { smallLetters: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -308,7 +309,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, { capitalChars: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+        passwordLib.calculatePassword(password, url, { capitalLetters: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
