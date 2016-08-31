@@ -99,6 +99,6 @@ THE SOFTWARE.
 
 [PBKDF2]: https://en.wikipedia.org/wiki/PBKDF2
 [Jasmine]: http://jasmine.github.io/2.4/introduction.html
-[Tests for src]: test/index_src.html  
-[Tests for dist]: test/index_dist.html  
-[Tests for dist (minified)]: test/index_dist_min.html    
+[Tests for src]: test/index_src.html
+[Tests for dist]: test/index_dist.html
+[Tests for dist (minified)]: test/index_dist_min.html
