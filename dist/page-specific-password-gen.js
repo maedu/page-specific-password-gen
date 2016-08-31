@@ -6,10 +6,23 @@ var passwordLib = (function () {
 		calculatePassword: calculatePassword,
 		calculatePasswordOld: calculatePasswordOld,
 		getBaseUrl: getBaseUrl,
-		getDomain: getDomain
+		getDomain: getDomain,
+		getDefaultOptions: getDefaultOptions
 	};
 
-	function calculatePassword(originalPassword, url, length, smallChars, capitalChars, numbers, specialChars, specialCharList, statusCallback, resultCallback, baseIterations) {
+	function calculatePassword(originalPassword, url, statusCallback, resultCallback, options) {
+		var intOptions = getDefaultOptions();
+
+		if (typeof options !== 'undefined') {
+			// Merge the options
+			for (var attrname in options) {
+				intOptions[attrname] = options[attrname];
+			}
+		}
+
+		if (options.verbose)
+			console.log('calculatePassword', 'url:', url, 'options:', intOptions);
+
 
 		if (originalPassword.trim() == '') {
 			// Skip calculation for an empty password
@@ -20,10 +33,11 @@ var passwordLib = (function () {
 		var domain = getDomain(url);
 		var salt = getBaseUrl(domain);
 
-		console.log('calculatePassword, salt:', salt);
+		if (options.verbose)
+			console.log('calculatePassword, salt:', salt);
 
 		// Encrypt password using the original password and the given salt value
-		var iterations = baseIterations + (salt.length + originalPassword.length + 1);
+		var iterations = intOptions.baseIterations + (salt.length + originalPassword.length + 1);
 
 		if (mypbkdf2 != null)
 			mypbkdf2.stop();
@@ -31,29 +45,29 @@ var passwordLib = (function () {
 		mypbkdf2 = new PBKDF2(originalPassword, salt, iterations, 128);
 
 		var intResultCallback = function(key) {
-			calculatePasswordInternal(key, length, salt, smallChars, capitalChars, numbers, specialChars, specialCharList, resultCallback);
+			calculatePasswordInternal(key, salt, intOptions, resultCallback);
 		};
 		mypbkdf2.deriveKey(statusCallback, intResultCallback);
 
 	}
 
-	function calculatePasswordInternal(key, length, salt, smallChars, capitalChars, numbers, specialChars, specialCharList, resultCallback) {
+	function calculatePasswordInternal(key, salt, options, resultCallback) {
 		var base64 = hexToBase64(key);
 
 		// Generate actual password (based on encrypted password), using the given criteria
 		var typeCount = 0;
-		if (smallChars)
+		if (options.smallChars)
 			typeCount++;
-		if (capitalChars)
+		if (options.capitalChars)
 			typeCount++;
-		if (numbers)
+		if (options.numbers)
 			typeCount++;
-		if (specialChars)
+		if (options.specialChars)
 			typeCount++;
 
 		var prefix = "";
 		var newPassword = "";
-		var specialCharsListStart = salt.length % specialCharList.length;
+		var specialCharsListStart = salt.length % options.specialCharList.length;
 
 		var smallCharsAdded = false;
 		var capitalCharsAdded = false;
@@ -70,28 +84,28 @@ var passwordLib = (function () {
 
 			if (typeCount > 0) {
 				// Generate prefix, containing one of each
-				if (smallChars && !smallCharsAdded && charCode >= 97
+				if (options.smallChars && !smallCharsAdded && charCode >= 97
 						&& charCode <= 122) {
 					prefix += curChar;
 					smallCharsAdded = true;
 					typeCount--;
 					charAdded = true;
-				} else if (capitalChars && !capitalCharsAdded && charCode >= 65
+				} else if (options.capitalChars && !capitalCharsAdded && charCode >= 65
 						&& charCode <= 90) {
 					prefix += curChar;
 					capitalCharsAdded = true;
 					typeCount--;
 					charAdded = true;
-				} else if (numbers && !numbersAdded && charCode >= 48
+				} else if (options.numbers && !numbersAdded && charCode >= 48
 						&& charCode <= 57) {
 					prefix += curChar;
 					numbersAdded = true;
 					typeCount--;
 					charAdded = true;
-				} else if (specialChars && !specialCharsAdded
+				} else if (options.specialChars && !specialCharsAdded
 						&& (charCode == 43 || charCode == 47 || charCode == 61)) {
-					prefix += specialCharList.charAt((specialCharsListStart + i)
-							% specialCharList.length);
+					prefix += options.specialCharList.charAt((specialCharsListStart + i)
+							% options.specialCharList.length);
 					specialCharsAdded = true;
 					typeCount--;
 					charAdded = true;
@@ -100,32 +114,32 @@ var passwordLib = (function () {
 			}
 
 			if (!charAdded) {
-				if (smallChars && charCode >= 97 && charCode <= 122) {
+				if (options.smallChars && charCode >= 97 && charCode <= 122) {
 					newPassword += curChar;
-				} else if (capitalChars && charCode >= 65 && charCode <= 90) {
+				} else if (options.capitalChars && charCode >= 65 && charCode <= 90) {
 					newPassword += curChar;
-				} else if (numbers && charCode >= 48 && charCode <= 57) {
+				} else if (options.numbers && charCode >= 48 && charCode <= 57) {
 					newPassword += curChar;
-				} else if (specialChars
+				} else if (options.specialChars
 						&& (charCode == 43 || charCode == 47 || charCode == 61)) {
-					newPassword += specialCharList
+					newPassword += options.specialCharList
 							.charAt((specialCharsListStart + i)
-									% specialCharList.length);
+									% options.specialCharList.length);
 				}
 			}
 
-			if (typeCount == 0 && prefix.length + newPassword.length >= length) {
+			if (typeCount == 0 && prefix.length + newPassword.length >= options.length) {
 				break;
 			}
 
 		}
 
-		resultCallback(prefix + newPassword.substring(0, length - prefix.length));
+		resultCallback((prefix + newPassword).substring(0, options.length));
 
 	}
 
 	/**
-	 * Old version, obsolete, use calculatePassword() instead
+	 * @deprecated old version, obsolete, use calculatePassword() instead
 	 */
 	function calculatePasswordOld(originalPassword, url, length, smallChars, capitalChars, numbers, specialChars, specialCharList, resultCallback){
 		if (originalPassword.trim() == '') {
@@ -204,10 +218,17 @@ var passwordLib = (function () {
 	}
 
 
-
+	/**
+   * Returns the base url from a given domain.
+	 * The base url is the domain name without the superdomain, e.g. for www.foobar.com it returns foobar.
+	 *
+	 * @param domain Domain to parse
+	 * @return base url of given domain
+	 *
+	 */
 	function getBaseUrl(domain) {
 
-		if (domain !== '') {
+		if (domain && domain !== '') {
 
 			var parts = domain.split('.').reverse();
 			var cnt = parts.length;
@@ -225,10 +246,20 @@ var passwordLib = (function () {
 			}
 		}
 
-		return '';
+		return domain;
 	}
 
+	/**
+	 * Returns the domain name for a given url
+	 *
+	 * @param origUrl	original url to be parsed
+	 * @return domain for given origUrl
+	 *
+	 */
 	function getDomain(origUrl) {
+		if (!origUrl)
+			return origUrl;
+
 		var parser = document.createElement('a');
 
 		var origUrlLower = origUrl.toLowerCase().replace('&nbsp;', '');
@@ -244,6 +275,22 @@ var passwordLib = (function () {
 		}
 
 		return parser.hostname;
+	}
+
+	/**
+	 * Returns the default options used for the calculation of the password.$
+	 * @return Object containing the default options.
+	 */
+	function getDefaultOptions() {
+		return {
+			length: 20,
+			smallChars: true,
+			capitalChars: true,
+			numbers: true,
+			specialChars: true,
+			specialCharList: '][?/<~#`!@$%^&*()+=}|:";\',>{',
+			baseIterations: 100
+		};
 	}
 
 

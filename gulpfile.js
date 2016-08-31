@@ -1,11 +1,13 @@
 'use strict'
 
-var gulp = require('gulp');
+const gulp = require('gulp');
 
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var debug = require('gulp-debug');
-var sourcemaps = require('gulp-sourcemaps');
+const concat = require('gulp-concat');
+const uglify = require('gulp-uglify');
+const debug = require('gulp-debug');
+const sourcemaps = require('gulp-sourcemaps');
+
+const jasmine = require('gulp-jasmine');
 
 gulp.task('default', ['scriptsMinified', 'scriptsNormal'], function() {
 });
@@ -33,4 +35,9 @@ gulp.task('scriptsNormal', function() {
       }
     }))
     .pipe(gulp.dest('dist'));
+});
+
+gulp.task('test', function() {
+  return gulp.src(['test/spec/*.spec.js'])
+    .pipe(jasmine());
 });

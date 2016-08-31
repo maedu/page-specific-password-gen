@@ -27,5 +27,8 @@
     "gruntfile.js",
     "package.json",
     "README.md"
-  ]
+  ],
+  "devDependencies": {
+    "jasmine-core": "jasmine#^2.4.1"
+  }
 }
