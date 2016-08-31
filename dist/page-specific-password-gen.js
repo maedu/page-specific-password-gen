@@ -10,48 +10,51 @@ var passwordLib = (function () {
 		getDefaultOptions: getDefaultOptions
 	};
 
-	function calculatePassword(originalPassword, url, statusCallback, resultCallback, options) {
-		var intOptions = getDefaultOptions();
+	function calculatePassword(originalPassword, url, options) {
+		return new Promise(function(resolve, reject) {
+			var intOptions = getDefaultOptions();
 
-		if (typeof options !== 'undefined') {
-			// Merge the options
-			for (var attrname in options) {
-				intOptions[attrname] = options[attrname];
+			if (typeof options !== 'undefined') {
+				// Merge the options
+				for (var attrname in options) {
+					intOptions[attrname] = options[attrname];
+				}
 			}
-		}
 
-		if (options.verbose)
-			console.log('calculatePassword', 'url:', url, 'options:', intOptions);
+			if (options.verbose)
+				console.log('calculatePassword', 'url:', url, 'options:', intOptions);
 
 
-		if (originalPassword.trim() == '') {
-			// Skip calculation for an empty password
-			resultCallback('');
-			return;
-		}
+			if (originalPassword.trim() == '') {
+				// Skip calculation for an empty password
+				resolve('');
+				return;
+			}
 
-		var domain = getDomain(url);
-		var salt = getBaseUrl(domain);
+			var domain = getDomain(url);
+			var salt = getBaseUrl(domain);
 
-		if (options.verbose)
-			console.log('calculatePassword, salt:', salt);
+			if (options.verbose)
+				console.log('calculatePassword, salt:', salt);
 
-		// Encrypt password using the original password and the given salt value
-		var iterations = intOptions.baseIterations + (salt.length + originalPassword.length + 1);
+			// Encrypt password using the original password and the given salt value
+			var iterations = intOptions.baseIterations + (salt.length + originalPassword.length + 1);
 
-		if (mypbkdf2 != null)
-			mypbkdf2.stop();
+			if (mypbkdf2 != null)
+				mypbkdf2.stop();
 
-		mypbkdf2 = new PBKDF2(originalPassword, salt, iterations, 128);
+			mypbkdf2 = new PBKDF2(originalPassword, salt, iterations, 128);
 
-		var intResultCallback = function(key) {
-			calculatePasswordInternal(key, salt, intOptions, resultCallback);
-		};
-		mypbkdf2.deriveKey(statusCallback, intResultCallback);
+			var intResultCallback = function (key) {
+				calculatePasswordInternal(key, salt, intOptions, resolve, reject);
+			};
+			mypbkdf2.deriveKey(options.statusCallback, intResultCallback);
+
+		});
 
 	}
 
-	function calculatePasswordInternal(key, salt, options, resultCallback) {
+	function calculatePasswordInternal(key, salt, options, resultCallback, rejectCallback) {
 		var base64 = hexToBase64(key);
 
 		// Generate actual password (based on encrypted password), using the given criteria
@@ -289,7 +292,8 @@ var passwordLib = (function () {
 			numbers: true,
 			specialChars: true,
 			specialCharList: '][?/<~#`!@$%^&*()+=}|:";\',>{',
-			baseIterations: 100
+			baseIterations: 100,
+			statusCallback: undefined
 		};
 	}
 

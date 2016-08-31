@@ -157,7 +157,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {verbose: true});
+        passwordLib.calculatePassword(password, url, {verbose: true, statusCallback: statusCallback}).then(resultCallback);
       });
 
       it('should calculate password correctly', function () {
@@ -182,7 +182,8 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {verbose: true});
+        
+        passwordLib.calculatePassword(password, url, { verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correctly', function () {
@@ -207,7 +208,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {verbose: true});
+        passwordLib.calculatePassword(password, url, { verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correctly', function () {
@@ -232,7 +233,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {verbose: true});
+        passwordLib.calculatePassword(password, url, { verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correctly', function () {
@@ -257,7 +258,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {verbose: true});
+        passwordLib.calculatePassword(password, url, { verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correctly', function () {
@@ -282,7 +283,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {smallChars: false, verbose: true});
+        passwordLib.calculatePassword(password, url, { smallChars: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -307,7 +308,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {capitalChars: false, verbose: true});
+        passwordLib.calculatePassword(password, url, { capitalChars: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -332,7 +333,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {numbers: false, verbose: true});
+        passwordLib.calculatePassword(password, url, { numbers: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -357,7 +358,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {specialChars: false, verbose: true});
+        passwordLib.calculatePassword(password, url, { specialChars: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -382,7 +383,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {specialCharList: ';.', verbose: true});
+        passwordLib.calculatePassword(password, url, { specialCharList: ';.', verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -407,7 +408,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 0, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 0, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -432,7 +433,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 1, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 1, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -457,7 +458,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 2, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 2, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -482,7 +483,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 3, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 3, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -507,7 +508,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 4, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 4, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -532,7 +533,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 5, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 5, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty', function () {
@@ -557,7 +558,7 @@
           result = generatedPassword;
           done();
         };
-        passwordLib.calculatePassword(password, url, statusCallback, resultCallback, {length: 200, verbose: true});
+        passwordLib.calculatePassword(password, url, { length: 200, verbose: true, statusCallback: statusCallback }).then(resultCallback);
       });
 
       it('should calculate password correclty, with max length of 172', function () {
