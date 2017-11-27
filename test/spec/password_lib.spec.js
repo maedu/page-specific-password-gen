@@ -139,6 +139,435 @@
 
   });
 
+  describe('Tests for password_lib.calculatePasswordSjclPbkdf2', function () {
+
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+
+    describe('Tests for default options with proper url', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'2X2UHvhwHMepdLq3';
+      var url = 'http://www.foo.com/abcd?xyz';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, {verbose: true}).then(resultCallback);
+      });
+
+      it('should calculate password correctly', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for default options with proper url', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'2X2UHvhwHMepdLq3';
+      var url = 'http://www.foo.com/abcd?xyz';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correctly', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for default options with different subdomain', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'2X2UHvhwHMepdLq3';
+      var url = 'http://abd.foo.com';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correctly', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for default options with different superdomain', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'2X2UHvhwHMepdLq3';
+      var url = 'http://www.foo.ch';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correctly', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for default options with different domain', function () {
+      var result = undefined;
+      var expectedPassword = 'j6J]aq2HMBSnMstrzipm';
+      var url = 'http://www.foo2.com/abcd?xyz';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correctly', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for default options without small chars', function () {
+      var result = undefined;
+      var expectedPassword = '6F\'2X2UHHML37P1SN7ZF';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { smallLetters: false, verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for default options without capital chars', function () {
+      var result = undefined;
+      var expectedPassword = '6i\'22vhwepdq3n7lb17d';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { capitalLetters: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options without numbers', function () {
+      var result = undefined;
+      var expectedPassword = 'iF\'XUHvhwHMepdLqnlbP';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { numbers: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options without special chars', function () {
+      var result = undefined;
+      var expectedPassword = '6iF2X2UHvhwHMepdLq3n';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { specialChars: false, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options with explicit special chars', function () {
+      var result = undefined;
+      var expectedPassword = '6iF;2X2UHvhwHMepdLq3';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { specialCharList: ';.', verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options with extra salt', function () {
+      var result = undefined;
+      var expectedPassword = 'rP5]uqZNwZo40VOcq6Ok';
+      var url = 'foo';
+      var password = 'bar';
+      var salt = 'a9a363bd018715dca9e29212bd56196d0e89b4f943e958207ae91622e4cc10e1';
+      console.log('salt', salt);
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { salt: salt, verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
+    describe('Tests for length 0', function () {
+      var result = undefined;
+      var expectedPassword = '';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 0, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for length 1', function () {
+      var result = undefined;
+      var expectedPassword = '6';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 1, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for length 2', function () {
+      var result = undefined;
+      var expectedPassword = '6i';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 2, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for length 3', function () {
+      var result = undefined;
+      var expectedPassword = '6iF';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 3, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options with length of 4', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 4, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options with length of 5', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'2';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 5, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+    describe('Tests for default options with length of 200', function () {
+      var result = undefined;
+      var expectedPassword = '6iF\'2X2UHvhwHMepdLq3n7lbP1SN7dZFsfdhOszKNX4zVAYOPpuE92x9Wu0MyTw7cJlkrIzrl5d62qIqlxe1Mg$%';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var statusCallback = function(percentage) {
+          statusCallbackCallCount++;
+        };
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { length: 200, verbose: true, statusCallback: statusCallback }).then(resultCallback);
+      });
+
+      it('should calculate password correclty, with max length of 89', function () {
+        expect(result).toBe(expectedPassword);
+        
+      });
+    });
+
+  });
 
   describe('Tests for password_lib.calculatePassword', function () {
 
@@ -184,7 +613,7 @@
           result = generatedPassword;
           done();
         };
-        
+
         passwordLib.calculatePassword(password, url, { verbose: true }).then(resultCallback);
       });
 

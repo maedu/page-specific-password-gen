@@ -3,12 +3,69 @@ var mypbkdf2 = null;
 var passwordLib = (function () {
 	"use strict";
 	return {
+		calculatePasswordSjclPbkdf2: calculatePasswordSjclPbkdf2,
 		calculatePassword: calculatePassword,
 		calculatePasswordOld: calculatePasswordOld,
+		randomHash: randomHash,
 		getBaseUrl: getBaseUrl,
 		getDomain: getDomain,
 		getDefaultOptions: getDefaultOptions
 	};
+
+
+	function calculatePasswordSjclPbkdf2(originalPassword, url, options) {
+		return new Promise(function(resolve, reject) {
+			var intOptions = getDefaultOptions();
+
+			if (typeof options !== 'undefined') {
+				// Merge the options
+				for (var attrname in options) {
+					intOptions[attrname] = options[attrname];
+				}
+			}
+
+			if (options.verbose)
+				console.log('calculatePassword', 'url:', url, 'options:', intOptions);
+
+
+			if (originalPassword.trim() == '') {
+				// Skip calculation for an empty password
+				resolve('');
+				return;
+			}
+
+			var domain = getDomain(url);
+
+			var out = sjcl.hash.sha256.hash(getBaseUrl(domain));
+			var salt = sjcl.codec.hex.fromBits(out);
+			if (options.salt) {
+				salt = options.salt + salt;
+			}
+
+			if (options.verbose)
+				console.log('calculatePassword, salt:', salt);
+
+			// Encrypt password using the original password and the given salt value
+			var iterations = intOptions.iterations + (salt.length + originalPassword.length + 1);
+
+
+			var hmacSHA1 = function (key) {
+				var hasher = new sjcl.misc.hmac( key, sjcl.hash.sha1 );
+				this.encrypt = function () {
+					return hasher.encrypt.apply( hasher, arguments );
+				};
+			};
+
+			var passwordSalt = sjcl.codec.utf8String.toBits(salt);
+			originalPassword = sjcl.codec.hex.toBits(originalPassword);
+			var derivedKey = sjcl.misc.pbkdf2( originalPassword, passwordSalt, iterations, 512, hmacSHA1 );
+			var hexKey = sjcl.codec.hex.fromBits( derivedKey );
+			calculatePasswordInternal(hexKey, salt, intOptions, resolve, reject);
+
+		});
+
+	}
+
 
 	function calculatePassword(originalPassword, url, options) {
 		return new Promise(function(resolve, reject) {
@@ -218,6 +275,11 @@ var passwordLib = (function () {
 
 		resultCallback(newPassword);
 
+	}
+
+	function randomHash() {
+		var out = sjcl.hash.sha256.hash(sjcl.random.randomWords(1)[0]);
+		return sjcl.codec.hex.fromBits(out);
 	}
 
 

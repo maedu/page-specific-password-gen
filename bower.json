@@ -1,9 +1,9 @@
 {
   "name": "page-specific-password-gen",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "homepage": "https://github.com/maedu/page-specific-password-gen",
   "authors": [
-    "Matthias Spinner <matthias@spinner-web.ch>"
+    "Matthias Spinner <npm@spinner-web.ch>"
   ],
   "description": "A library to generate password specific passwords",
   "main": "bower_components/password_lib.js",
