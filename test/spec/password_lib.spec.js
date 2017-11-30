@@ -392,6 +392,28 @@
       });
     });
 
+
+    describe('Tests for default options with more iterations', function () {
+      var result = undefined;
+      var expectedPassword = '!Ed4%MBFGzZzBsuFTkaV';
+      var url = 'foo';
+      var password = 'bar';
+      var defaultOptions = passwordLib.getDefaultOptions();
+      var statusCallbackCallCount = 0;
+
+      beforeEach(function(done) {
+        var resultCallback = function(generatedPassword) {
+          result = generatedPassword;
+          done();
+        };
+        passwordLib.calculatePasswordSjclPbkdf2(password, url, { iterations: 100000, verbose: true }).then(resultCallback);
+      });
+
+      it('should calculate password correclty', function () {
+        expect(result).toBe(expectedPassword);
+      });
+    });
+
     describe('Tests for length 0', function () {
       var result = undefined;
       var expectedPassword = '';
