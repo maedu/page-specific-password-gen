@@ -339,8 +339,8 @@ var passwordLib = (function () {
 
 		parser.href = url;
 
-		if ((parser.host.indexOf('magic-key') >= 0 && origUrlLower.indexOf('magic-key') == -1)
-				|| (parser.host.indexOf('localhost') >= 0 && origUrlLower.indexOf('localhost') == -1)) {
+		var host = window.location.hostname;
+		if ((parser.host.indexOf(host) >= 0 && origUrlLower.indexOf(host) == -1)) {
 			// This is handled as a relative url, change it to an absolute one
 			url = 'http://'+url;
 			parser.href = url;
