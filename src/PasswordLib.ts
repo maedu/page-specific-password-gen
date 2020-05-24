@@ -1,0 +1,206 @@
+import { Options } from "./options";
+import { EncodeDecode } from "./EncodeDecode";
+import * as PBKDF2 from "./crypt/pbkdf2";
+
+export class PasswordLib {
+
+    mypbkdf2: any;
+
+    public getBaseUrl = (domain: string): string => {
+
+        if (domain && domain !== '') {
+
+            var parts = domain.split('.').reverse();
+            var cnt = parts.length;
+            if (cnt >= 3) {
+                // see if the second level domain is a common SLD.
+                if (parts[1].match(/^(com|edu|gov|net|mil|org|nom|co|name|info|biz)$/i)) {
+                    return parts[2];
+                } else {
+                    return parts[1];
+                }
+            } else if (cnt >= 2) {
+                return parts[1];
+            } else {
+                return domain;
+            }
+        }
+
+        return domain;
+    }
+
+    /**
+     * Returns the domain name for a given url
+     *
+     * @param origUrl	original url to be parsed
+     * @return domain for given origUrl
+     *
+     */
+    public getDomain = (origUrl: string): string => {
+        if (!origUrl)
+            return origUrl;
+
+        var parser = document.createElement('a');
+
+        var origUrlLower = origUrl.toLowerCase().replace('&nbsp;', '');
+        var url = origUrlLower;
+
+        parser.href = url;
+
+        var host = window.location.hostname;
+        if ((parser.host.indexOf(host) >= 0 && origUrlLower.indexOf(host) == -1)) {
+            // This is handled as a relative url, change it to an absolute one
+            url = 'http://' + url;
+            parser.href = url;
+        }
+
+        return parser.hostname;
+    }
+
+
+    public getDefaultOptions = (): Options => {
+        return {
+            length: 20,
+            smallLetters: true,
+            capitalLetters: true,
+            numbers: true,
+            specialChars: true,
+            specialCharList: '][?/<~#`!@$%^&*()+=}|:";\',>{',
+            iterations: 100,
+            statusCallback: undefined
+        };
+    }
+
+    public calculatePassword = (originalPassword: string, url: string, options: Options) => {
+        let passwordLib = this;
+		return new Promise(function(resolve, reject) {
+			var intOptions: Options = passwordLib.getDefaultOptions();
+
+			if (typeof options !== 'undefined') {
+                // Merge the options
+				intOptions = {...intOptions, ...options};
+			}
+
+			if (options.verbose)
+				console.log('calculatePassword', 'url:', url, 'options:', intOptions);
+
+
+			if (originalPassword.trim() == '') {
+				// Skip calculation for an empty password
+				resolve('');
+				return;
+			}
+
+			var domain = passwordLib.getDomain(url);
+			var salt = passwordLib.getBaseUrl(domain);
+
+			if (options.verbose)
+				console.log('calculatePassword, salt:', salt);
+
+			// Encrypt password using the original password and the given salt value
+			var iterations = intOptions.iterations + (salt.length + originalPassword.length + 1);
+
+			if (passwordLib.mypbkdf2 != null)
+            passwordLib.mypbkdf2.stop();
+
+			passwordLib.mypbkdf2 = new PBKDF2(originalPassword, salt, iterations, 128);
+
+			var intResultCallback = (key: string) => {
+				passwordLib.calculatePasswordInternal(key, salt, intOptions, resolve, reject);
+			};
+			passwordLib.mypbkdf2.deriveKey(options.statusCallback, intResultCallback);
+
+		});
+
+	}
+
+    private calculatePasswordInternal = (key: string, salt: string, options: Options, resultCallback: any, rejectCallback: any): void => {
+
+        var base64 = EncodeDecode.b64DecodeUnicode(key);
+    
+        // Generate actual password (based on encrypted password), using the given criteria
+        var typeCount = 0;
+        if (options.smallLetters)
+            typeCount++;
+        if (options.capitalLetters)
+            typeCount++;
+        if (options.numbers)
+            typeCount++;
+        if (options.specialChars)
+            typeCount++;
+    
+        var prefix = "";
+        var newPassword = "";
+        var specialCharsListStart = salt.length % options.specialCharList.length;
+    
+        var smallLettersAdded = false;
+        var capitalLettersAdded = false;
+        var numbersAdded = false;
+        var specialCharsAdded = false;
+        var charAdded = false;
+    
+        for (var i = 0; i < base64.length; i++) {
+            var curChar = base64.charAt(i);
+            var charCode = curChar.charCodeAt(0);
+    
+            charAdded = false;
+    
+    
+            if (typeCount > 0) {
+                // Generate prefix, containing one of each
+                if (options.smallLetters && !smallLettersAdded && charCode >= 97
+                        && charCode <= 122) {
+                    prefix += curChar;
+                    smallLettersAdded = true;
+                    typeCount--;
+                    charAdded = true;
+                } else if (options.capitalLetters && !capitalLettersAdded && charCode >= 65
+                        && charCode <= 90) {
+                    prefix += curChar;
+                    capitalLettersAdded = true;
+                    typeCount--;
+                    charAdded = true;
+                } else if (options.numbers && !numbersAdded && charCode >= 48
+                        && charCode <= 57) {
+                    prefix += curChar;
+                    numbersAdded = true;
+                    typeCount--;
+                    charAdded = true;
+                } else if (options.specialChars && !specialCharsAdded
+                        && (charCode == 43 || charCode == 47 || charCode == 61)) {
+                    prefix += options.specialCharList.charAt((specialCharsListStart + i)
+                            % options.specialCharList.length);
+                    specialCharsAdded = true;
+                    typeCount--;
+                    charAdded = true;
+                }
+    
+            }
+    
+            if (!charAdded) {
+                if (options.smallLetters && charCode >= 97 && charCode <= 122) {
+                    newPassword += curChar;
+                } else if (options.capitalLetters && charCode >= 65 && charCode <= 90) {
+                    newPassword += curChar;
+                } else if (options.numbers && charCode >= 48 && charCode <= 57) {
+                    newPassword += curChar;
+                } else if (options.specialChars
+                        && (charCode == 43 || charCode == 47 || charCode == 61)) {
+                    newPassword += options.specialCharList
+                            .charAt((specialCharsListStart + i)
+                                    % options.specialCharList.length);
+                }
+            }
+    
+            if (typeCount == 0 && prefix.length + newPassword.length >= options.length) {
+                break;
+            }
+    
+        }
+    
+        resultCallback((prefix + newPassword).substring(0, options.length));
+    
+    }
+
+
+}
