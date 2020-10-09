@@ -3,73 +3,62 @@ var sjclPbkdf2Timeout = null;
 
 var passwordLib = (function () {
 	"use strict";
-	return {
-		calculatePasswordSjclPbkdf2: calculatePasswordSjclPbkdf2,
-		calculatePassword: calculatePassword,
-		calculatePasswordOld: calculatePasswordOld,
-		randomHash: randomHash,
-		getBaseUrl: getBaseUrl,
-		getDomain: getDomain,
-		getDefaultOptions: getDefaultOptions
-	};
 
-	function calculatePasswordSjclPbkdf2(originalPassword, url, options) {
-		return new Promise(function(resolve, reject) {
-			if (sjclPbkdf2Timeout !== null) {
-				clearTimeout(sjclPbkdf2Timeout);
-			}
 
-			if (originalPassword.trim() === '') {
+
+	async function calculatePasswordSjclPbkdf2(originalPassword, url, options) {
+
+		if (originalPassword.trim() === '') {
 				// Skip calculation for an empty password
-				resolve('');
-				return;
+				return Promise.resolve('');
 			}
 
-			var callback = function() {
-				var intOptions = getDefaultOptions();
+			var resolve = () => {
+			var intOptions = getDefaultOptions();
 
-				if (typeof options !== 'undefined') {
-					// Merge the options
-					for (var attrname in options) {
-						intOptions[attrname] = options[attrname];
-					}
+			if (typeof options !== 'undefined') {
+				// Merge the options
+				for (var attrname in options) {
+					intOptions[attrname] = options[attrname];
 				}
+			}
 
-				if (options.verbose)
-					console.log('calculatePassword', 'url:', url, 'options:', intOptions);
+			if (options.verbose)
+				console.log('calculatePassword', 'url:', url, 'options:', intOptions);
 
-				var domain = getDomain(url);
+			var domain = getDomain(url);
 
-				var out = sjcl.hash.sha256.hash(getBaseUrl(domain));
-				var salt = sjcl.codec.hex.fromBits(out);
-				if (options.salt) {
-					salt = options.salt + salt;
-				}
+			var out = sjcl.hash.sha256.hash(getBaseUrl(domain));
+			var salt = sjcl.codec.hex.fromBits(out);
+			if (options.salt) {
+				salt = options.salt + salt;
+			}
 
-				if (options.verbose)
-					console.log('calculatePassword, salt:', salt);
+			if (options.verbose)
+				console.log('calculatePassword, salt:', salt);
 
-				// Encrypt password using the original password and the given salt value
-				var iterations = intOptions.iterations + (salt.length + originalPassword.length + 1);
+			// Encrypt password using the original password and the given salt value
+			var iterations = intOptions.iterations + (salt.length + originalPassword.length + 1);
 
 
-				var hmacSHA1 = function (key) {
-					var hasher = new sjcl.misc.hmac( key, sjcl.hash.sha1 );
-					this.encrypt = function () {
-						return hasher.encrypt.apply( hasher, arguments );
-					};
+			var hmacSHA1 = function (key) {
+				var hasher = new sjcl.misc.hmac( key, sjcl.hash.sha1 );
+				this.encrypt = function () {
+					return hasher.encrypt.apply( hasher, arguments );
 				};
-
-				var passwordSalt = sjcl.codec.utf8String.toBits(salt);
-				originalPassword = sjcl.codec.hex.toBits(originalPassword);
-				var derivedKey = sjcl.misc.pbkdf2( originalPassword, passwordSalt, iterations, 512, hmacSHA1 );
-				var hexKey = sjcl.codec.hex.fromBits( derivedKey );
-				calculatePasswordInternal(hexKey, salt, intOptions, resolve, reject);
 			};
 
-			sjclPbkdf2Timeout = setTimeout(callback, 0);
+			var passwordSalt = sjcl.codec.utf8String.toBits(salt);
+			originalPassword = sjcl.codec.hex.toBits(originalPassword);
+			var derivedKey = sjcl.misc.pbkdf2( originalPassword, passwordSalt, iterations, 512, hmacSHA1 );
+			var hexKey = sjcl.codec.hex.fromBits( derivedKey );
+			console.log('calculated');
+			return calculatePasswordInternal(hexKey, salt, intOptions);
 
-		});
+
+		};
+
+			return Promise.resolve(resolve());
 
 	}
 
@@ -110,7 +99,7 @@ var passwordLib = (function () {
 			mypbkdf2 = new PBKDF2(originalPassword, salt, iterations, 128);
 
 			var intResultCallback = function (key) {
-				calculatePasswordInternal(key, salt, intOptions, resolve, reject);
+				resolve(calculatePasswordInternal(key, salt, intOptions));
 			};
 			mypbkdf2.deriveKey(options.statusCallback, intResultCallback);
 
@@ -118,7 +107,7 @@ var passwordLib = (function () {
 
 	}
 
-	function calculatePasswordInternal(key, salt, options, resultCallback, rejectCallback) {
+	function calculatePasswordInternal(key, salt, options) {
 		var base64 = hexToBase64(key);
 
 		// Generate actual password (based on encrypted password), using the given criteria
@@ -201,7 +190,7 @@ var passwordLib = (function () {
 
 		}
 
-		resultCallback((prefix + newPassword).substring(0, options.length));
+		return (prefix + newPassword).substring(0, options.length);
 
 	}
 
@@ -353,7 +342,7 @@ var passwordLib = (function () {
 	 * Returns the default options used for the calculation of the password.$
 	 * @return Object containing the default options.
 	 */
-	function getDefaultOptions() {
+	var getDefaultOptions = () => {
 		return {
 			length: 20,
 			smallLetters: true,
@@ -366,5 +355,14 @@ var passwordLib = (function () {
 		};
 	}
 
+	return {
+		calculatePasswordSjclPbkdf2: calculatePasswordSjclPbkdf2,
+		calculatePassword: calculatePassword,
+		calculatePasswordOld: calculatePasswordOld,
+		randomHash: randomHash,
+		getBaseUrl: getBaseUrl,
+		getDomain: getDomain,
+		getDefaultOptions: getDefaultOptions
+	};
 
 }());

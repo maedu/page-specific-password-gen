@@ -393,7 +393,7 @@
     });
 
 
-    describe('Tests for default options with more iterations', function () {
+    fdescribe('Tests for default options with more iterations', function () {
       var result = undefined;
       var expectedPassword = '!Ed4%MBFGzZzBsuFTkaV';
       var url = 'foo';
@@ -403,10 +403,15 @@
 
       beforeEach(function(done) {
         var resultCallback = function(generatedPassword) {
+          console.log('resultCallback end');
           result = generatedPassword;
           done();
         };
+
+        console.log('calculatePasswordSjclPbkdf2 start');
         passwordLib.calculatePasswordSjclPbkdf2(password, url, { iterations: 100000, verbose: true }).then(resultCallback);
+        console.log('calculatePasswordSjclPbkdf2 after');
+
       });
 
       it('should calculate password correclty', function () {
