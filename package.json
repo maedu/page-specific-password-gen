@@ -2,7 +2,10 @@
   "name": "page-specific-password-gen",
   "version": "1.0.7",
   "description": "A small library which allows the generation of page specific passwords",
-  "main": "index.js",
+  "unpkg": "dist/page-specific-password-gen.js",
+  "module": "dist/page-specific-password-gen.js",
+  "main": "dist/page-specific-password-gen.js",
+  "types": "index.d.ts",
   "directories": {
     "doc": "docs"
   },
@@ -20,11 +23,11 @@
   },
   "homepage": "https://github.com/maedu/page-specific-password-gen#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
-    "gulp-debug": "^2.1.2",
-    "gulp-jasmine": "^2.4.0",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-uglify": "^2.0.0"
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-debug": "^3.2.0",
+    "gulp-jasmine": "^3.0.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-uglify": "^3.0.2"
   }
 }
